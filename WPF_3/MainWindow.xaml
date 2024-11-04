@@ -15,7 +15,7 @@
             </MenuItem>
         </Menu>
         <ToolBarTray Height="35" DockPanel.Dock="Top">
-            <ToolBar Height="38" Width="400" Background="Chartreuse">
+            <ToolBar Height="38" Width="400" Background="#FF009AFF">
                 <Label Content="筆刷色彩" FontSize="14" VerticalContentAlignment="Center" FontWeight="Bold"/>
                 <xctk:ColorPicker x:Name="strokeColorPicker" Width="100" SelectedColorChanged="strokeColorPicker_SelectedColorChanged"/>
                 <StatusBar/>
