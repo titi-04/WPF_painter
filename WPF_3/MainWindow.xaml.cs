@@ -1,8 +1,10 @@
 ﻿using Microsoft.Win32;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace WPF_3
@@ -167,14 +169,14 @@ namespace WPF_3
                     var shape = e.OriginalSource as Shape;
                     myCanvas.Cursor = Cursors.Hand;
                     myCanvas.Children.Remove(shape);
-                    if(myCanvas.Children.Count == 0) myCanvas.Cursor = Cursors.Arrow;
+                    if (myCanvas.Children.Count == 0) myCanvas.Cursor = Cursors.Arrow;
                     break;
             }
         }
 
         private void DisplayStatus()
         {
-            if(actionType != "draw") statusAction.Content = $"{actionType}";
+            if (actionType != "draw") statusAction.Content = $"{actionType}";
             else statusAction.Content = $"繪圖模式:{shapeType}";
             statusPoint.Content = $"({Convert.ToInt32(start.X)}, {Convert.ToInt32(start.Y)}) - ({Convert.ToInt32(dest.X)}, {Convert.ToInt32(dest.Y)})";
             int lineCount = myCanvas.Children.OfType<Line>().Count();
@@ -223,17 +225,40 @@ namespace WPF_3
                 DefaultExt = ".png"
             };
 
-            if(saveFileDialog.ShowDialog() == true)
+            if (saveFileDialog.ShowDialog() == true)
             {
-              
+                int w = Convert.ToInt32(myCanvas.RenderSize.Width);
+                int h = Convert.ToInt32(myCanvas.RenderSize.Height);
+
+                RenderTargetBitmap renderBitmap = new RenderTargetBitmap(w, h, 96d, 96d, PixelFormats.Pbgra32);                
+                renderBitmap.Render(myCanvas);
+
+                BitmapEncoder encoder;
+                string extension = System.IO.Path.GetExtension(saveFileDialog.FileName).ToLower(); ;
+                switch(extension)
+                {
+                    case ".jpg":
+                        encoder = new JpegBitmapEncoder();
+                        break;
+                    default:
+                        encoder = new PngBitmapEncoder();
+                        break;
+                }
+
+                encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
+
+                using (FileStream outStream = new FileStream(saveFileDialog.FileName,FileMode.Create))
+                {
+                    encoder.Save(outStream);
+                }
             }
         }
 
-        private void StrokeThicknessSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            strokeThickness = (int)strokeThicknessSlider.Value;
-        }
-
-
+    private void StrokeThicknessSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        strokeThickness = (int)strokeThicknessSlider.Value;
     }
+
+
+}
 }
