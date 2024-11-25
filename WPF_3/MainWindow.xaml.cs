@@ -255,10 +255,8 @@ namespace WPF_3
         }
 
     private void StrokeThicknessSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
+        {
         strokeThickness = (int)strokeThicknessSlider.Value;
-    }
-
-
-}
+        }
+    }  
 }
