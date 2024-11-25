@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Microsoft.Win32;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -62,6 +63,7 @@ namespace WPF_3
                     polyline.StrokeThickness = strokeThickness;
                     break;
             }
+            DisplayStatus();
         }
 
         private void MyCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -115,6 +117,7 @@ namespace WPF_3
                         break;
                 }
             }
+            DisplayStatus();
         }
         private void MyCanvas_MouseMove(object sender, MouseEventArgs e)
         {
@@ -171,7 +174,14 @@ namespace WPF_3
 
         private void DisplayStatus()
         {
+            if(actionType != "draw") statusAction.Content = $"{actionType}";
+            else statusAction.Content = $"繪圖模式:{shapeType}";
             statusPoint.Content = $"({Convert.ToInt32(start.X)}, {Convert.ToInt32(start.Y)}) - ({Convert.ToInt32(dest.X)}, {Convert.ToInt32(dest.Y)})";
+            int lineCount = myCanvas.Children.OfType<Line>().Count();
+            int rectangleCount = myCanvas.Children.OfType<Rectangle>().Count();
+            int ellipseCount = myCanvas.Children.OfType<Ellipse>().Count();
+            int polylineCount = myCanvas.Children.OfType<Polyline>().Count();
+            statusShape.Content = $"Lines:{lineCount} Rectangles:{rectangleCount} Ellipses:{ellipseCount} Polylines:{polylineCount}";
         }
 
         private void StrokeColorPicker_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
@@ -194,12 +204,29 @@ namespace WPF_3
         private void EraseButton_Click(object sender, RoutedEventArgs e)
         {
             actionType = "erase";
+            DisplayStatus();
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             actionType = "clear";
             myCanvas.Children.Clear();
+            DisplayStatus();
+        }
+
+        private void SaveCanvas_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Title = "儲存畫布",
+                Filter = "PNG Files (*.png)|*.png|JPG Files (*.jpg)|*.jpg|All Files (*.*)|*.*",
+                DefaultExt = ".png"
+            };
+
+            if(saveFileDialog.ShowDialog() == true)
+            {
+              
+            }
         }
 
         private void StrokeThicknessSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
